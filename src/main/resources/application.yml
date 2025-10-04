@@ -1,0 +1,24 @@
+server:
+  port: 8081
+
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: rewrite-test-route
+              uri: http://localhost:8082
+              predicates:
+                - Path=/api/test
+              filters:
+                - RewritePath=/api/test, /test
+              default-filters:
+                - PreserveHostHeader
+                - RequestHeaderToRequestUri=X-Forwarded-For
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/ecc-realm
