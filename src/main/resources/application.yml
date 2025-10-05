@@ -8,7 +8,7 @@ spring:
         webflux:
           routes:
             - id: rewrite-test-route
-              uri: http://localhost:8082
+              uri: http://company:8082
               predicates:
                 - Path=/api/test
               filters:
@@ -21,4 +21,4 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/ecc-realm
+          issuer-uri: http://keycloak.default.svc.cluster.local:8080/realms/ecc-realm

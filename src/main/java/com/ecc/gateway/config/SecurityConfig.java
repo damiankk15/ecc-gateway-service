@@ -16,6 +16,7 @@ public class SecurityConfig
     {
         return aHttp
             .authorizeExchange( exchanges -> exchanges
+//                .pathMatchers( "/api" ).permitAll()
                 .anyExchange().authenticated() )
             .oauth2ResourceServer( oauth2 -> oauth2
                 .jwt( Customizer.withDefaults() ) )
