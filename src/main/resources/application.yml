@@ -1,5 +1,13 @@
+api:
+  title: '@project.name@'
+  description: '@project.description@'
+  version: '@project.version@'
+
+  endpoints:
+    signup: /api/auth/actions/signup
+
 server:
-  port: 8081
+  port: 8080
 
 spring:
   cloud:
@@ -7,18 +15,35 @@ spring:
       server:
         webflux:
           routes:
-            - id: rewrite-test-route
-              uri: http://company:8082
+            - id: auth-service
+              uri: http://auth-service-dev.default.svc.cluster.local:8088
               predicates:
-                - Path=/api/test
+                - Path=/auth/**
               filters:
-                - RewritePath=/api/test, /test
-              default-filters:
+                - RewritePath=/auth/(?<segment>.*), /$\{segment}
                 - PreserveHostHeader
-                - RequestHeaderToRequestUri=X-Forwarded-For
+            - id: auth-service2
+              uri: http://auth-service-dev.default.svc.cluster.local:8088
+              predicates:
+                - Path=/api/auth/**
+              filters:
+                - RewritePath=/api/auth/(?<segment>.*), /api/auth/$\{segment}
+                - PreserveHostHeader
 
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://keycloak.default.svc.cluster.local:8080/realms/ecc-realm
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    urls:
+      - name: GATEWAY
+        url: /v3/api-docs
+      - name: AUTH SERVICE
+        url: /auth/v3/api-docs
+    urls-primary-name: AUTH SERVICE
