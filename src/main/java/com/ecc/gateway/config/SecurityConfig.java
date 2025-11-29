@@ -30,10 +30,12 @@ public class SecurityConfig
         return aHttp
             .csrf( csrf -> csrf.disable() )
             .authorizeExchange( exchanges -> exchanges
+                .pathMatchers( "/api" ).permitAll()
+                .pathMatchers( "/api/auth/actions/signup" ).permitAll()
                 .pathMatchers( "/swagger-ui/**" ).permitAll()
                 .pathMatchers( "/v3/api-docs/**" ).permitAll()
-                .pathMatchers( "/api" ).permitAll()
-                .anyExchange().permitAll() )
+                .pathMatchers( "/auth/v3/api-docs/**" ).permitAll()
+                .anyExchange().authenticated() )
             .oauth2ResourceServer( oauth2 -> oauth2
                 .jwt( Customizer.withDefaults() ) )
             .build();

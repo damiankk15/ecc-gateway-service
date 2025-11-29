@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration holder for API endpoint definitions exposed by the Gateway.
+ * Configuration properties for API endpoint definitions exposed by the Gateway.
  * 
  * @author Damian Kuras
  * @version 1.0

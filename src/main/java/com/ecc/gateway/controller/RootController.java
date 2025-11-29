@@ -27,7 +27,7 @@ import reactor.core.publisher.Mono;
  * @version 1.0
  * @since 0.0.1-SNAPSHOT
  */
-@Tag( name  = "Gateway API", description = "Hypermedia links" )
+@Tag( name = "Gateway API", description = "Hypermedia links" )
 @RestController
 @RequestMapping( "/api" )
 public class RootController
