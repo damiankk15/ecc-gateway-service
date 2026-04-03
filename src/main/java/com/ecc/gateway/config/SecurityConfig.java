@@ -32,6 +32,7 @@ public class SecurityConfig
             .authorizeExchange( exchanges -> exchanges
                 .pathMatchers( "/api" ).permitAll()
                 .pathMatchers( "/api/auth/actions/signup" ).permitAll()
+                .pathMatchers( "/api/auth/actions/signin" ).permitAll()
                 .pathMatchers( "/swagger-ui/**" ).permitAll()
                 .pathMatchers( "/v3/api-docs/**" ).permitAll()
                 .pathMatchers( "/auth/v3/api-docs/**" ).permitAll()
