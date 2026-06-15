@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 
+import com.ecc.gateway.controller.dto.HypermediaResponse;
+
 public class RootTestCase
 {
     // input
@@ -13,7 +15,7 @@ public class RootTestCase
 
     // expected results
     public HttpStatus expectedStatus;
-    public Map< String, Object > expectedRoot;
+    public HypermediaResponse expectedRoot;
 
     public static final class Builder
     {
@@ -31,7 +33,7 @@ public class RootTestCase
             return this;
         }
 
-        public Builder withExpectedRoot( Map< String, Object > aExpectedRoot )
+        public Builder withExpectedRoot( HypermediaResponse aExpectedRoot )
         {
             instance.expectedRoot = aExpectedRoot;
             return this;

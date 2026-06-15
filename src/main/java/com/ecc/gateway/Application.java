@@ -12,7 +12,8 @@ import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 
 /**
- * The main entry point for the Spring Boot application.
+ * Entry point for the ECC Gateway Service. Bootstraps the Spring Boot application and declares the global OpenAPI definition (title, version, 
+ * contact, license) together with the HTTP Bearer JWT security scheme used across all protected endpoints.
  * 
  * @author Damian Kuras
  * @version 1.0
@@ -34,6 +35,11 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 @SpringBootApplication
 public class Application
 {
+    /**
+     * Starts the Spring Boot application.
+     * 
+     * @param aArgs command-line arguments passed to the JVM
+     */
     public static void main( String[] aArgs )
     {
         SpringApplication.run( Application.class, aArgs );

@@ -3,8 +3,6 @@ package com.ecc.gateway.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,14 +17,17 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import com.ecc.gateway.config.properties.ApiEndpoints;
 import com.ecc.gateway.controller.argumentsprovider.RootArgumentsProvider;
+import com.ecc.gateway.controller.dto.HypermediaResponse;
 import com.ecc.gateway.controller.testcase.RootTestCase;
 import tools.jackson.databind.json.JsonMapper;
 
 @ExtendWith( MockitoExtension.class )
 public class RootControllerTest
 {
+    public static final String BASE_URL = "http://ecc-api.local";
+
     private WebTestClient webTestClient;
-    private JacksonTester< Map< String, Object > > jsonTester;
+    private JacksonTester< HypermediaResponse > jsonTester;
 
     @Mock
     private ApiEndpoints apiEndpoints;
@@ -41,10 +42,12 @@ public class RootControllerTest
 
         webTestClient = WebTestClient
             .bindToController( rootController )
+            .configureClient()
+            .baseUrl( BASE_URL )
             .build();
     }
 
-    @DisplayName( "[root] => Should return correct api enpoints for operations and resources exposed by the Gateway" )
+    @DisplayName( "[root] => Should return correct api endpoints for operations and resources exposed by the Gateway" )
     @ParameterizedTest( name = "[{index}] => {0}" )
     @ArgumentsSource( RootArgumentsProvider.class )
     void shouldReturnCorrectApiEndpoints( String aTN, RootTestCase aTC ) throws Exception

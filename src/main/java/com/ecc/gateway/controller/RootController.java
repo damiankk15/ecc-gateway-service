@@ -11,6 +11,8 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ecc.gateway.config.properties.ApiEndpoints;
+import com.ecc.gateway.controller.dto.HypermediaResponse;
+import com.ecc.gateway.controller.dto.HypermediaResponse.LinkObject;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,7 +24,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import reactor.core.publisher.Mono;
 
 /**
- * This controller that provides hypermedia links to key actions and resources available in the API.
+ * REST controller that serves the API root ({@code GET /api}) and returns HATEOAS-style hypermedia links pointing to key operations and resources 
+ * exposed by the Gateway. Clients can use these links for dynamic API discovery without hard-coding downstream URLs.
  * 
  * @author Damian Kuras
  * @version 1.0
@@ -38,7 +41,7 @@ public class RootController
     /**
      * Creates a new {@link RootController} with a provided {@link ApiEndpoints} configuration.
      * 
-     * @param aApiEndpoints component providing endpoint definitions to be exposed
+     * @param aApiEndpoints component providing endpoint definitions to be exposed as hypermedia links
      */
     public RootController( ApiEndpoints aApiEndpoints )
     {
@@ -46,10 +49,11 @@ public class RootController
     }
 
     /**
-     * Returns a map of hypermedia links for API discovery.
+     * Returns a {@link HypermediaResponse} containing absolute hypermedia links for all configured API endpoints. The base URL (scheme, host, port) 
+     * is resolved from the incoming request, which already reflects the public-facing address after {@code ForwardedHeaderTransformer} processing.
      * 
-     * @param aRequest the incoming HTTP request used to resolve protocol, host, and port
-     * @return a reactive {@link Mono} containing hypermedia links
+     * @param aRequest the incoming HTTP request used to resolve the public base URL
+     * @return a reactive {@link Mono} emitting the hypermedia link map
      */
     @Operation(
         summary = "Returns hypermedia links for API discovery",
@@ -57,9 +61,7 @@ public class RootController
             + "Gateway.",
         security =
         {
-            @SecurityRequirement(
-                name = "Authorization"
-            )
+            @SecurityRequirement( name = "Authorization" )
         },
         responses =
         {
@@ -70,37 +72,33 @@ public class RootController
                 {
                     @Content(
                         mediaType = "application/json",
-                        schema = @Schema( implementation = Map.class ),
+                        schema = @Schema( implementation = HypermediaResponse.class ),
                         examples =
                         {
                             @ExampleObject(
                                 name = "Example response",
-                                value = "{"
-                                    + "\"_links\": {"
-                                        + "\"jobs\": {"
-                                            + "\"href\": \"http://ecc-api.dev.local/api/jobs\""
-                                        + "}"
-                                    + "}"
-                                + "}" )
+                                value = """
+                                    {"_links":{"jobs":{"href":"http://ecc-api.local/api/jobs"}}}""" )
                         } )
                 } )
         } )
     @GetMapping
-    public Mono< Map< String, Object > > root( ServerHttpRequest aRequest )
+    public Mono< HypermediaResponse > root( ServerHttpRequest aRequest )
     {
         String baseUrl = resolveBaseUrl( aRequest );
 
-        Map< String, Object > links = apiEndpoints.getEndpoints().entrySet().stream()
-            .collect( Collectors.toMap( Map.Entry::getKey, value -> Map.of( "href", baseUrl + value.getValue() ) ) );
+        Map< String, LinkObject > links = apiEndpoints.getEndpoints().entrySet().stream()
+            .collect( Collectors.toMap( Map.Entry::getKey, e -> new LinkObject( baseUrl + e.getValue() ) ) );
 
-        return Mono.just( Map.of( "_links", links ) );
+        return Mono.just( new HypermediaResponse( links ) );
     }
 
+
     /**
-     * Resolves the base URL (scheme, host, port) from the incoming request.
+     * Extracts the base URL (scheme, host, and port) from the incoming request by stripping the path and query string.
      * 
      * @param aRequest the HTTP request from which the base URL is extracted
-     * @return a base URL string
+     * @return a base URL string in the form {@code scheme://host[:port]}
      */
     private String resolveBaseUrl( ServerHttpRequest aRequest )
     {
