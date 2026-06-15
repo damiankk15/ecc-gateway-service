@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import reactor.core.publisher.Mono;
 
@@ -54,6 +55,12 @@ public class RootController
         summary = "Returns hypermedia links for API discovery",
         description = "Exposes HATEOAS-style links that allow clients to dynamically discover available API operations and resources exposed by the "
             + "Gateway.",
+        security =
+        {
+            @SecurityRequirement(
+                name = "Authorization"
+            )
+        },
         responses =
         {
             @ApiResponse(
@@ -70,8 +77,8 @@ public class RootController
                                 name = "Example response",
                                 value = "{"
                                     + "\"_links\": {"
-                                        + "\"signup\": {"
-                                            + "\"href\": \"http://ecc-api.dev.local/api/auth/actions/signup\""
+                                        + "\"jobs\": {"
+                                            + "\"href\": \"http://ecc-api.dev.local/api/jobs\""
                                         + "}"
                                     + "}"
                                 + "}" )

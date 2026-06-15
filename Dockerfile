@@ -3,8 +3,6 @@ FROM maven:3.9.11-eclipse-temurin-25 AS build
 WORKDIR /app
 
 COPY pom.xml .
-COPY mvnw .
-COPY .mvn .mvn
 RUN mvn dependency:go-offline -B
 
 # Copy the source code and build
@@ -17,6 +15,9 @@ WORKDIR /app
 
 # Copy the jar from the build stage
 COPY --from=build /app/target/*.jar app.jar
+
+RUN addgroup --system spring && adduser --system spring --ingroup spring
+USER spring:spring
 
 EXPOSE 8080
 

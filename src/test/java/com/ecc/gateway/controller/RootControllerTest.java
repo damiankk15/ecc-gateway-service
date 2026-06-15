@@ -20,7 +20,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import com.ecc.gateway.config.properties.ApiEndpoints;
 import com.ecc.gateway.controller.argumentsprovider.RootArgumentsProvider;
 import com.ecc.gateway.controller.testcase.RootTestCase;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @ExtendWith( MockitoExtension.class )
 public class RootControllerTest
@@ -37,7 +37,7 @@ public class RootControllerTest
     @BeforeEach
     void setup()
     {
-        JacksonTester.initFields( this, new ObjectMapper() );
+        JacksonTester.initFields( this, JsonMapper.builder().build() );
 
         webTestClient = WebTestClient
             .bindToController( rootController )

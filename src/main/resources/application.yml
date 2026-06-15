@@ -15,23 +15,24 @@ spring:
       server:
         webflux:
           routes:
-            - id: auth-service-api
-              uri: http://auth-service:8080
+            - id: job-api
+              uri: http://job-service:8080
               predicates:
-                - Path=/api/auth/**
+                - Path=/api/jobs/**
 
-            - id: auth-service-docs
-              uri: http://auth-service:8080
+            - id: job-service-docs
+              uri: http://job-service:8080
               predicates:
-                - Path=/auth/v3/api-docs
+                - Path=/jobs/v3/api-docs
               filters:
-                - RewritePath=/auth/v3/api-docs, /v3/api-docs
+                - RewritePath=/jobs/v3/api-docs, /v3/api-docs
 
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloak:8080/realms/ecc-realm
+          jwk-set-uri: http://keycloak:8080/realms/ecc-realm/protocol/openid-connect/certs
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:https://keycloak.local/realms/ecc-realm}
 
 springdoc:
   api-docs:
@@ -41,6 +42,6 @@ springdoc:
     urls:
       - name: Gateway API
         url: /v3/api-docs
-      - name: Auth API
-        url: /auth/v3/api-docs
+      - name: Job API
+        url: /jobs/v3/api-docs
     urls-primary-name: Gateway API

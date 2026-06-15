@@ -30,10 +30,8 @@ public class SecurityConfig
         return aHttp
             .csrf( csrf -> csrf.disable() )
             .authorizeExchange( exchanges -> exchanges
-                .pathMatchers( "/api" ).permitAll()
-                .pathMatchers( "/api/auth/actions/signup" ).permitAll()
-                .pathMatchers( "/api/auth/actions/signin" ).permitAll()
-                .pathMatchers( "/swagger-ui/**" ).permitAll()
+                .pathMatchers( "/actuator/health", "/actuator/info" ).permitAll()
+                .pathMatchers( "/swagger-ui.html", "/swagger-ui/**" ).permitAll()
                 .pathMatchers( "/v3/api-docs/**" ).permitAll()
                 .pathMatchers( "/auth/v3/api-docs/**" ).permitAll()
                 .anyExchange().authenticated() )

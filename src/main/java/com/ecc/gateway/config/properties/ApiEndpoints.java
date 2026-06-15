@@ -1,5 +1,6 @@
 package com.ecc.gateway.config.properties;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -16,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties( prefix = "api" )
 public class ApiEndpoints
 {
-    private Map< String, String > endpoints;
+    private Map< String, String > endpoints = new HashMap<>();
 
     /**
      * Returns all configured API endpoints.

@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 @SecurityScheme(
     name = "Authorization",
     scheme = "bearer",
+    bearerFormat = "JWT",
     type = SecuritySchemeType.HTTP,
     in = SecuritySchemeIn.HEADER )
 @SpringBootApplication
