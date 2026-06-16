@@ -7,8 +7,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * Configuration properties for API endpoint definitions exposed by the Gateway. Bound to the {@code api.endpoints} prefix in 
- * {@code application.yml}, where each key is a logical endpoint name and each value is its relative URI path.
+ * Configuration properties for API endpoint definitions exposed by the Gateway. Bound to the {@code api.endpoints} prefix in {@code application.yml},
+ * where each key is a logical endpoint name and each value is its relative URI path.
  * 
  * @author Damian Kuras
  * @version 1.0

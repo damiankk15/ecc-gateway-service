@@ -9,8 +9,8 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.server.adapter.ForwardedHeaderTransformer;
 
 /**
- * Security configuration for the Spring WebFlux Gateway API. Disables CSRF, enforces JWT-based OAuth2 resource server authentication on all 
- * exchanges except publicly accessible paths, and registers a {@link ForwardedHeaderTransformer} so that controllers receive the correct 
+ * Security configuration for the Spring WebFlux Gateway API. Disables CSRF, enforces JWT-based OAuth2 resource server authentication on all
+ * exchanges except publicly accessible paths, and registers a {@link ForwardedHeaderTransformer} so that controllers receive the correct
  * public-facing URL when the gateway runs behind a reverse proxy.
  * 
  * @author Damian Kuras
@@ -22,8 +22,8 @@ import org.springframework.web.server.adapter.ForwardedHeaderTransformer;
 public class SecurityConfig
 {
     /**
-     * Registers a {@link ForwardedHeaderTransformer} that rewrites the request URI from {@code X-Forwarded-Host}, {@code X-Forwarded-Proto}, and 
-     * {@code X-Forwarded-Port} headers before the request reaches any controller. This ensures URL generation (e.g. hypermedia links) reflects the 
+     * Registers a {@link ForwardedHeaderTransformer} that rewrites the request URI from {@code X-Forwarded-Host}, {@code X-Forwarded-Proto}, and
+     * {@code X-Forwarded-Port} headers before the request reaches any controller. This ensures URL generation (e.g. hypermedia links) reflects the
      * public-facing address rather than the internal one.
      * 
      * @return a {@link ForwardedHeaderTransformer} instance

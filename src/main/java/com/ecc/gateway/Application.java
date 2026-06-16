@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 
 /**
- * Entry point for the ECC Gateway Service. Bootstraps the Spring Boot application and declares the global OpenAPI definition (title, version, 
+ * Entry point for the ECC Gateway Service. Bootstraps the Spring Boot application and declares the global OpenAPI definition (title, version,
  * contact, license) together with the HTTP Bearer JWT security scheme used across all protected endpoints.
  * 
  * @author Damian Kuras

@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import reactor.core.publisher.Mono;
 
 /**
- * REST controller that serves the API root ({@code GET /api}) and returns HATEOAS-style hypermedia links pointing to key operations and resources 
+ * REST controller that serves the API root ({@code GET /api}) and returns HATEOAS-style hypermedia links pointing to key operations and resources
  * exposed by the Gateway. Clients can use these links for dynamic API discovery without hard-coding downstream URLs.
  * 
  * @author Damian Kuras
@@ -49,7 +49,7 @@ public class RootController
     }
 
     /**
-     * Returns a {@link HypermediaResponse} containing absolute hypermedia links for all configured API endpoints. The base URL (scheme, host, port) 
+     * Returns a {@link HypermediaResponse} containing absolute hypermedia links for all configured API endpoints. The base URL (scheme, host, port)
      * is resolved from the incoming request, which already reflects the public-facing address after {@code ForwardedHeaderTransformer} processing.
      * 
      * @param aRequest the incoming HTTP request used to resolve the public base URL
