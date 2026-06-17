@@ -3,8 +3,8 @@ api:
   description: '@project.description@'
   version: '@project.version@'
 
-  endpoints:
-    signup: /api/auth/actions/signup
+  resources:
+    jobs: /api/jobs
 
 server:
   port: 8080

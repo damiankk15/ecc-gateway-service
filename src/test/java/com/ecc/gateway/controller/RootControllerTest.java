@@ -15,7 +15,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.test.web.reactive.server.FluxExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import com.ecc.gateway.config.properties.ApiEndpoints;
+import com.ecc.gateway.config.properties.ApiResources;
 import com.ecc.gateway.controller.argumentsprovider.RootArgumentsProvider;
 import com.ecc.gateway.controller.dto.HypermediaResponse;
 import com.ecc.gateway.controller.testcase.RootTestCase;
@@ -30,7 +30,7 @@ public class RootControllerTest
     private JacksonTester< HypermediaResponse > jsonTester;
 
     @Mock
-    private ApiEndpoints apiEndpoints;
+    private ApiResources apiResources;
 
     @InjectMocks
     private RootController rootController;
@@ -47,13 +47,13 @@ public class RootControllerTest
             .build();
     }
 
-    @DisplayName( "[root] => Should return correct api endpoints for operations and resources exposed by the Gateway" )
+    @DisplayName( "[root] => Should return correct api resources exposed by the Gateway" )
     @ParameterizedTest( name = "[{index}] => {0}" )
     @ArgumentsSource( RootArgumentsProvider.class )
-    void shouldReturnCorrectApiEndpoints( String aTN, RootTestCase aTC ) throws Exception
+    void shouldReturnCorrectApiResources( String aTN, RootTestCase aTC ) throws Exception
     {
         // given
-        when( apiEndpoints.getEndpoints() ).thenReturn ( aTC.mockedApiEndpoints );
+        when( apiResources.getResources() ).thenReturn ( aTC.mockedApiResources );
 
         // when
         FluxExchangeResult< String > response = webTestClient

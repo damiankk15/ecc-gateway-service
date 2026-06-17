@@ -11,7 +11,7 @@ public class RootTestCase
     // input
 
     // mocked values
-    public Map< String, String > mockedApiEndpoints;
+    public Map< String, String > mockedApiResources;
 
     // expected results
     public HttpStatus expectedStatus;
@@ -21,9 +21,9 @@ public class RootTestCase
     {
         private final RootTestCase instance = new RootTestCase();
 
-        public Builder withMockedApiEndpoints( Map< String, String > aMockedApiEndpoints )
+        public Builder withMockedApiResources( Map< String, String > aMockedApiResources )
         {
-            instance.mockedApiEndpoints = aMockedApiEndpoints;
+            instance.mockedApiResources = aMockedApiResources;
             return this;
         }
 

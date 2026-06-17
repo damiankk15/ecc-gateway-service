@@ -19,7 +19,7 @@ import com.ecc.gateway.controller.testcase.RootTestCase;
 
 public class RootArgumentsProvider implements ArgumentsProvider
 {
-    private static final Map< String, String > API_ENDPOINTS_V = Map.of(
+    private static final Map< String, String > API_RESOURCES_V = Map.of(
         "jobs", "/api/jobs" );
 
     @Override
@@ -27,16 +27,16 @@ public class RootArgumentsProvider implements ArgumentsProvider
     {
         return Stream.of(
             // negative test cases
-            arguments( "Empty api endpoints", emptyApiEndpointsTestCase() ),
+            arguments( "Empty api resources", emptyApiResourcesTestCase() ),
 
             // positive test cases
             arguments( "Root test case", rootTestCase() ) );
     }
 
-    private RootTestCase emptyApiEndpointsTestCase()
+    private RootTestCase emptyApiResourcesTestCase()
     {
         return new RootTestCase.Builder()
-            .withMockedApiEndpoints( Collections.emptyMap() )
+            .withMockedApiResources( Collections.emptyMap() )
             .withExpectedStatus( HttpStatus.OK )
             .withExpectedRoot( new HypermediaResponse( Collections.emptyMap() ) )
             .build();
@@ -45,9 +45,9 @@ public class RootArgumentsProvider implements ArgumentsProvider
     private RootTestCase rootTestCase()
     {
         return new RootTestCase.Builder()
-            .withMockedApiEndpoints( API_ENDPOINTS_V )
+            .withMockedApiResources( API_RESOURCES_V )
             .withExpectedStatus( HttpStatus.OK )
-            .withExpectedRoot( new HypermediaResponse( API_ENDPOINTS_V.entrySet().stream()
+            .withExpectedRoot( new HypermediaResponse( API_RESOURCES_V.entrySet().stream()
                 .collect( Collectors.toMap( Map.Entry::getKey, e -> new LinkObject( RootControllerTest.BASE_URL + e.getValue() ) ) ) ) )
             .build();
     }

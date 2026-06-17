@@ -49,7 +49,7 @@ public class SecurityConfig
                 .pathMatchers( "/actuator/health", "/actuator/info" ).permitAll()
                 .pathMatchers( "/swagger-ui.html", "/swagger-ui/**" ).permitAll()
                 .pathMatchers( "/v3/api-docs/**" ).permitAll()
-                .pathMatchers( "/auth/v3/api-docs/**" ).permitAll()
+                .pathMatchers( "/jobs/v3/api-docs/**" ).permitAll()
                 .anyExchange().authenticated() )
             .oauth2ResourceServer( oauth2 -> oauth2
                 .jwt( Customizer.withDefaults() ) )
