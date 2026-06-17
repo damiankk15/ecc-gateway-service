@@ -23,8 +23,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import reactor.core.publisher.Mono;
 
 /**
- * REST controller that serves the API root ({@code GET /api}) and returns HATEOAS-style hypermedia links pointing to key operations and resources
- * exposed by the Gateway. Clients can use these links for dynamic API discovery without hard-coding downstream URLs.
+ * REST controller that serves the API root ({@code GET /api}) and returns HATEOAS-style hypermedia links pointing to all resources exposed by the
+ * Gateway. Clients can use these links for dynamic API discovery without hard-coding downstream URLs.
  * 
  * @author Damian Kuras
  * @version 1.0
