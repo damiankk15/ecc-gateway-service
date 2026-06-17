@@ -56,8 +56,7 @@ public class RootController
      */
     @Operation(
         summary = "Returns hypermedia links for API discovery",
-        description = "Exposes HATEOAS-style links that allow clients to dynamically discover available API operations and resources exposed by the "
-            + "Gateway.",
+        description = "Exposes HATEOAS-style links that allow clients to dynamically discover available API resources exposed by the Gateway.",
         responses =
         {
             @ApiResponse(
