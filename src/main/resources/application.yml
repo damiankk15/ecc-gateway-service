@@ -19,6 +19,8 @@ spring:
               uri: http://job-service:8080
               predicates:
                 - Path=/api/jobs/**
+              filters:
+              - PreserveHostHeader
 
             - id: job-service-docs
               uri: http://job-service:8080
