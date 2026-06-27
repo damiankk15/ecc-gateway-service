@@ -6,6 +6,9 @@ api:
   resources:
     jobs: /api/jobs
 
+  cors:
+    allowed-origins: []
+
 server:
   port: 8080
 

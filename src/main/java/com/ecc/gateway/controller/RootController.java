@@ -11,6 +11,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ecc.gateway.config.properties.ApiResources;
+import com.ecc.gateway.controller.dto.ApiResponse;
 import com.ecc.gateway.controller.dto.HypermediaResponse;
 import com.ecc.gateway.controller.dto.HypermediaResponse.LinkObject;
 
@@ -18,7 +19,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import reactor.core.publisher.Mono;
 
@@ -48,43 +48,44 @@ public class RootController
     }
 
     /**
-     * Returns a {@link HypermediaResponse} containing absolute hypermedia links for all configured API resources. The base URL (scheme, host, port)
-     * is resolved from the incoming request, which already reflects the public-facing address after {@code ForwardedHeaderTransformer} processing.
-     * 
+     * Returns an {@link ApiResponse} wrapping a {@link HypermediaResponse} that contains absolute hypermedia links for all configured API resources.
+     * The base URL (scheme, host, port) is resolved from the incoming request, which already reflects the public-facing address after
+     * {@code ForwardedHeaderTransformer} processing.
+     *
      * @param aRequest the incoming HTTP request used to resolve the public base URL
-     * @return a reactive {@link Mono} emitting the hypermedia link map
+     * @return a reactive {@link Mono} emitting the {@link ApiResponse} envelope containing the hypermedia link map
      */
     @Operation(
         summary = "Returns hypermedia links for API discovery",
         description = "Exposes HATEOAS-style links that allow clients to dynamically discover available API resources exposed by the Gateway.",
         responses =
         {
-            @ApiResponse(
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "200",
                 description = "OK",
                 content =
                 {
                     @Content(
                         mediaType = "application/json",
-                        schema = @Schema( implementation = HypermediaResponse.class ),
+                        schema = @Schema( implementation = ApiResponse.class ),
                         examples =
                         {
                             @ExampleObject(
                                 name = "Example response",
                                 value = """
-                                    {"_links":{"jobs":{"href":"http://ecc-api.local/api/jobs"}}}""" )
+                                    {"status":"OK","data":{"_links":{"jobs":{"href":"http://ecc-api.local/api/jobs"}}},"errors":[]}""" )
                         } )
                 } )
         } )
     @GetMapping
-    public Mono< HypermediaResponse > root( ServerHttpRequest aRequest )
+    public Mono< ApiResponse< HypermediaResponse > > root( ServerHttpRequest aRequest )
     {
         String baseUrl = resolveBaseUrl( aRequest );
 
         Map< String, LinkObject > links = apiResources.getResources().entrySet().stream()
             .collect( Collectors.toMap( Map.Entry::getKey, e -> new LinkObject( baseUrl + e.getValue() ) ) );
 
-        return Mono.just( new HypermediaResponse( links ) );
+        return Mono.just( ApiResponse.ok( new HypermediaResponse( links ) ) );
     }
 
     /**
