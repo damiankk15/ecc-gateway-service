@@ -5,6 +5,9 @@ api:
 
   resources:
     jobs: /api/jobs
+    job: /api/jobs/{jobId}
+    companies: /api/companies
+    markets: /api/markets
 
   cors:
     allowed-origins: []
@@ -24,6 +27,20 @@ spring:
                 - Path=/api/jobs/**
               filters:
               - PreserveHostHeader
+
+            - id: company-api
+              uri: http://company-service:8080
+              predicates:
+                - Path=/api/companies/**,/api/markets/**
+              filters:
+              - PreserveHostHeader
+
+            - id: company-service-docs
+              uri: http://company-service:8080
+              predicates:
+                - Path=/companies/v3/api-docs
+              filters:
+                - RewritePath=/companies/v3/api-docs, /v3/api-docs
 
             - id: job-service-docs
               uri: http://job-service:8080
@@ -47,6 +64,8 @@ springdoc:
     urls:
       - name: Gateway API
         url: /v3/api-docs
+      - name: Company API
+        url: /companies/v3/api-docs
       - name: Job API
         url: /jobs/v3/api-docs
     urls-primary-name: Gateway API

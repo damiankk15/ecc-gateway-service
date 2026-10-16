@@ -73,7 +73,7 @@ public class RootController
                             @ExampleObject(
                                 name = "Example response",
                                 value = """
-                                    {"status":"OK","data":{"_links":{"jobs":{"href":"http://ecc-api.local/api/jobs"}}},"errors":[]}""" )
+                                    {"status":"OK","data":{"_links":{"jobs":{"href":"http://ecc-api.local/api/jobs"},"job":{"href":"http://ecc-api.local/api/jobs/{jobId}","templated":true}}},"errors":[]}""" )
                         } )
                 } )
         } )
@@ -83,7 +83,7 @@ public class RootController
         String baseUrl = resolveBaseUrl( aRequest );
 
         Map< String, LinkObject > links = apiResources.getResources().entrySet().stream()
-            .collect( Collectors.toMap( Map.Entry::getKey, e -> new LinkObject( baseUrl + e.getValue() ) ) );
+            .collect( Collectors.toMap( Map.Entry::getKey, e -> new LinkObject( baseUrl + e.getValue(), e.getValue().contains( "{" ) ) ) );
 
         return Mono.just( ApiResponse.ok( new HypermediaResponse( links ) ) );
     }

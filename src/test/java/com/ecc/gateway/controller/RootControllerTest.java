@@ -17,6 +17,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import com.ecc.gateway.config.properties.ApiResources;
 import com.ecc.gateway.controller.argumentsprovider.RootArgumentsProvider;
+import com.ecc.gateway.controller.dto.ApiResponse;
 import com.ecc.gateway.controller.dto.HypermediaResponse;
 import com.ecc.gateway.controller.testcase.RootTestCase;
 import tools.jackson.databind.json.JsonMapper;
@@ -27,7 +28,7 @@ public class RootControllerTest
     public static final String BASE_URL = "http://ecc-api.local";
 
     private WebTestClient webTestClient;
-    private JacksonTester< HypermediaResponse > jsonTester;
+    private JacksonTester< ApiResponse< HypermediaResponse > > jsonTester;
 
     @Mock
     private ApiResources apiResources;
@@ -64,6 +65,6 @@ public class RootControllerTest
 
         // then
         assertEquals( aTC.expectedStatus, response.getStatus() );
-        assertEquals( jsonTester.write( aTC.expectedRoot ).getJson(), response.getResponseBody().blockFirst() );
+        assertEquals( jsonTester.write( ApiResponse.ok( aTC.expectedRoot ) ).getJson(), response.getResponseBody().blockFirst() );
     }
 }

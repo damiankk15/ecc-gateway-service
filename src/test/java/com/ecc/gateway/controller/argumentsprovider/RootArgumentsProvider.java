@@ -20,7 +20,8 @@ import com.ecc.gateway.controller.testcase.RootTestCase;
 public class RootArgumentsProvider implements ArgumentsProvider
 {
     private static final Map< String, String > API_RESOURCES_V = Map.of(
-        "jobs", "/api/jobs" );
+        "jobs", "/api/jobs",
+        "job", "/api/jobs/{jobId}" );
 
     @Override
     public Stream< ? extends Arguments > provideArguments( ExtensionContext aContext )
@@ -48,7 +49,8 @@ public class RootArgumentsProvider implements ArgumentsProvider
             .withMockedApiResources( API_RESOURCES_V )
             .withExpectedStatus( HttpStatus.OK )
             .withExpectedRoot( new HypermediaResponse( API_RESOURCES_V.entrySet().stream()
-                .collect( Collectors.toMap( Map.Entry::getKey, e -> new LinkObject( RootControllerTest.BASE_URL + e.getValue() ) ) ) ) )
+                .collect( Collectors.toMap( Map.Entry::getKey,
+                    e -> new LinkObject( RootControllerTest.BASE_URL + e.getValue(), e.getValue().contains( "{" ) ) ) ) ) )
             .build();
     }
 }
