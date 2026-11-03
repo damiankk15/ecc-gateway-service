@@ -1,4 +1,4 @@
-package com.ecc.gateway.controller.dto;
+package com.ecc.gateway.dto;
 
 import java.util.List;
 
@@ -15,8 +15,7 @@ import java.util.List;
  * @version 1.0
  * @since 0.0.1-SNAPSHOT
  */
-public record ApiResponse< T >( ApiResponseStatus status, T data, List< ApiError > errors )
-{
+public record ApiResponse<T>(ApiResponseStatus status, T data, List<ApiError> errors) {
     /**
      * Creates a successful response wrapping the given payload.
      *
@@ -24,9 +23,8 @@ public record ApiResponse< T >( ApiResponseStatus status, T data, List< ApiError
      * @param data the payload to wrap
      * @return an {@link ApiResponse} with status {@link ApiResponseStatus#OK}, the given data, and an empty error list
      */
-    public static < T > ApiResponse< T > ok( T data )
-    {
-        return new ApiResponse<>( ApiResponseStatus.OK, data, List.of() );
+    public static <T> ApiResponse<T> ok(T data) {
+        return new ApiResponse<>(ApiResponseStatus.OK, data, List.of());
     }
 
     /**
@@ -37,8 +35,7 @@ public record ApiResponse< T >( ApiResponseStatus status, T data, List< ApiError
      * @param errors one or more errors describing what went wrong
      * @return an {@link ApiResponse} with the given status, {@code null} data, and the provided errors
      */
-    public static < T > ApiResponse< T > error( ApiResponseStatus status, List< ApiError > errors )
-    {
-        return new ApiResponse<>( status, null, errors );
+    public static <T> ApiResponse<T> error(ApiResponseStatus status, List<ApiError> errors) {
+        return new ApiResponse<>(status, null, errors);
     }
 }

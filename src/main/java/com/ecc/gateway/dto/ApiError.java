@@ -1,5 +1,6 @@
-package com.ecc.gateway.controller.dto;
+package com.ecc.gateway.dto;
 
+/////////////////////////////
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -13,8 +14,5 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @version 1.0
  * @since 0.0.1-SNAPSHOT
  */
-@JsonInclude( JsonInclude.Include.NON_NULL )
-public record ApiError( String field, String name, String message )
-{
-
-}
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record ApiError(String field, String name, String message) {}

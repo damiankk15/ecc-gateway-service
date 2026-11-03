@@ -1,7 +1,7 @@
 package com.ecc.gateway.config;
 
+import com.ecc.gateway.config.properties.CorsProperties;
 import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -11,14 +11,10 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-import org.springframework.web.server.adapter.ForwardedHeaderTransformer;
-
-import com.ecc.gateway.config.properties.CorsProperties;
 
 /**
- * Security configuration for the Spring WebFlux Gateway API. Disables CSRF, configures CORS from {@link CorsProperties}, enforces JWT-based OAuth2
- * resource server authentication on all exchanges except publicly accessible paths, and registers a {@link ForwardedHeaderTransformer} so that
- * controllers receive the correct public-facing URL when the gateway runs behind a reverse proxy.
+ * Security configuration for the Spring WebFlux Gateway API. Disables CSRF, configures CORS from {@link CorsProperties}, and enforces JWT-based
+ * OAuth2 resource server authentication on all exchanges except the publicly accessible paths.
  *
  * @author Damian Kuras
  * @version 1.0
@@ -26,73 +22,70 @@ import com.ecc.gateway.config.properties.CorsProperties;
  */
 @Configuration
 @EnableWebFluxSecurity
-public class SecurityConfig
-{
+public class SecurityConfig {
+
     private final CorsProperties corsProperties;
 
     /**
      * Creates a new {@link SecurityConfig} with the provided {@link CorsProperties}.
      *
-     * @param aCorsProperties CORS settings resolved from {@code application.yml}
+     * @param corsProperties CORS settings resolved from {@code application.yml}
      */
-    public SecurityConfig( CorsProperties aCorsProperties )
-    {
-        this.corsProperties = aCorsProperties;
+    public SecurityConfig(CorsProperties corsProperties) {
+        this.corsProperties = corsProperties;
     }
 
     /**
-     * Registers a {@link ForwardedHeaderTransformer} that rewrites the request URI from {@code X-Forwarded-Host}, {@code X-Forwarded-Proto}, and
-     * {@code X-Forwarded-Port} headers before the request reaches any controller. This ensures URL generation (e.g. hypermedia links) reflects the
-     * public-facing address rather than the internal one.
-     *
-     * @return a {@link ForwardedHeaderTransformer} instance
-     */
-    @Bean
-    ForwardedHeaderTransformer forwardedHeaderTransformer()
-    {
-        return new ForwardedHeaderTransformer();
-    }
-
-    /**
-     * Builds a reactive {@link CorsConfigurationSource} from the origins declared in {@link CorsProperties}. Credentials are allowed so that the
-     * browser includes the {@code Authorization} header on cross-origin requests.
+     * Builds a reactive {@link CorsConfigurationSource} from the origins declared in {@link CorsProperties}. All request headers are allowed so that
+     * the browser can send the {@code Authorization} bearer token on cross-origin requests. Credentials (cookies) are not allowed, as the API is
+     * authenticated with bearer tokens only.
      *
      * @return a {@link CorsConfigurationSource} applied to all paths
      */
     @Bean
-    CorsConfigurationSource corsConfigurationSource()
-    {
+    CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins( corsProperties.getAllowedOrigins() );
-        config.setAllowedMethods( List.of( "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ) );
-        config.setAllowedHeaders( List.of( "*" ) );
-        config.setAllowCredentials( true );
+        config.setAllowedOrigins(corsProperties.getAllowedOrigins());
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration( "/**", config );
+        source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 
     /**
-     * Configures the reactive Spring Security filter chain for the Gateway API.
+     * Configures the reactive Spring Security filter chain for the Gateway API. Health and info actuator endpoints, Swagger UI and the OpenAPI
+     * documents of the Gateway and downstream services are publicly accessible; every other exchange requires a valid JWT bearer token issued by
+     * Keycloak. CSRF protection is disabled because the API is stateless and does not use cookie-based authentication.
      *
-     * @param aHttp the {@link ServerHttpSecurity} builder used to configure WebFlux security
+     * @param http the {@link ServerHttpSecurity} builder used to configure WebFlux security
      * @return a configured {@link SecurityWebFilterChain} instance
      */
     @Bean
-    SecurityWebFilterChain securityWebFilterChain( ServerHttpSecurity aHttp )
-    {
-        return aHttp
-            .cors( cors -> cors.configurationSource( corsConfigurationSource() ) )
-            .csrf( csrf -> csrf.disable() )
-            .authorizeExchange( exchanges -> exchanges
-                .pathMatchers( "/actuator/health", "/actuator/info" ).permitAll()
-                .pathMatchers( "/swagger-ui.html", "/swagger-ui/**" ).permitAll()
-                .pathMatchers( "/v3/api-docs/**" ).permitAll()
-                .pathMatchers( "/jobs/v3/api-docs/**" ).permitAll()
-                .anyExchange().authenticated() )
-            .oauth2ResourceServer( oauth2 -> oauth2
-                .jwt( Customizer.withDefaults() ) )
+    SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+        return http
+            .cors(Customizer.withDefaults())
+            .csrf(ServerHttpSecurity.CsrfSpec::disable)
+            .authorizeExchange(exchanges ->
+                exchanges
+                    .pathMatchers(
+                        "/actuator/health",
+                        "/actuator/info",
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/webjars/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/jobs/v3/api-docs/**",
+                        "/companies/v3/api-docs/**"
+                    )
+                    .permitAll()
+                    .anyExchange()
+                    .authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
             .build();
     }
 }

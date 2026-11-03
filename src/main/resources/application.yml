@@ -1,7 +1,7 @@
 api:
-  title: '@project.name@'
-  description: '@project.description@'
-  version: '@project.version@'
+  title: "@project.name@"
+  description: "@project.description@"
+  version: "@project.version@"
 
   resources:
     jobs: /api/jobs
@@ -14,26 +14,28 @@ api:
 
 server:
   port: 8080
+  forward-headers-strategy: framework
 
 spring:
   cloud:
     gateway:
       server:
         webflux:
+          trusted-proxies: 10\..*
           routes:
             - id: job-api
               uri: http://job-service:8080
               predicates:
                 - Path=/api/jobs/**
               filters:
-              - PreserveHostHeader
+                - PreserveHostHeader
 
             - id: company-api
               uri: http://company-service:8080
               predicates:
                 - Path=/api/companies/**,/api/markets/**
               filters:
-              - PreserveHostHeader
+                - PreserveHostHeader
 
             - id: company-service-docs
               uri: http://company-service:8080

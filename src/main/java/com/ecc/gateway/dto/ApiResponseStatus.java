@@ -1,4 +1,4 @@
-package com.ecc.gateway.controller.dto;
+package com.ecc.gateway.dto;
 
 /**
  * Enumeration of all possible response status values returned by the Gateway API. These values mirror the {@code ApiResponseStatus} enum used on the
@@ -8,11 +8,10 @@ package com.ecc.gateway.controller.dto;
  * @version 1.0
  * @since 0.0.1-SNAPSHOT
  */
-public enum ApiResponseStatus
-{
+public enum ApiResponseStatus {
     OK,
     VALIDATION_ERROR,
     NOT_FOUND_ERROR,
     BAD_CREDENTIALS,
-    FORBIDDEN
+    FORBIDDEN,
 }
