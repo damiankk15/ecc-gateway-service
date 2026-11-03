@@ -1,6 +1,6 @@
 package com.ecc.gateway.config.properties;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -17,10 +17,10 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "api")
 public class ApiResources {
 
-    private Map<String, String> resources = new HashMap<>();
+    private Map<String, String> resources = new LinkedHashMap<>();
 
     /**
-     * Returns all configured API resource paths.
+     * Returns all configured API resource paths, in the order they are declared in the configuration.
      *
      * @return map of logical resource names to their relative URI paths
      */

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriTemplate;
 import reactor.core.publisher.Mono;
 
 /**
@@ -45,9 +47,9 @@ public class RootController {
 
     /**
      * Returns an {@link ApiResponse} wrapping a {@link HypermediaResponse} that contains absolute hypermedia links for all configured API resources.
-     * Paths containing URI template variables (e.g. {@code {jobId}}) are marked as {@code templated}. The base URL (scheme, host, port) is resolved
-     * from the incoming request, which reflects the public-facing address when forwarded headers are applied
-     * ({@code server.forward-headers-strategy=framework}).
+     * Links are returned in the order the resources are configured, and paths containing URI template variables (e.g. {@code {jobId}}) are marked as
+     * {@code templated}. The base URL (scheme, host, port) is resolved from the incoming request, which reflects the public-facing address when
+     * forwarded headers are applied ({@code server.forward-headers-strategy=framework}).
      *
      * @param request the incoming HTTP request used to resolve the public base URL
      * @return a reactive {@link Mono} emitting the {@link ApiResponse} envelope containing the hypermedia link map
@@ -67,7 +69,19 @@ public class RootController {
                             @ExampleObject(
                                 name = "Example response",
                                 value = """
-                                {"status":"OK","data":{"_links":{"jobs":{"href":"https://ecc-api.local/api/jobs"},"job":{"href":"https://ecc-api.local/api/jobs/{jobId}","templated":true}}},"errors":[]}"""
+                                {
+                                  "status": "OK",
+                                  "data": {
+                                    "_links": {
+                                      "jobs": { "href": "https://ecc-api.local/api/jobs" },
+                                      "job": { "href": "https://ecc-api.local/api/jobs/{jobId}", "templated": true },
+                                      "companies": { "href": "https://ecc-api.local/api/companies" },
+                                      "markets": { "href": "https://ecc-api.local/api/markets" }
+                                    }
+                                  },
+                                  "errors": []
+                                }
+                                """
                             ),
                         }
                     ),
@@ -83,9 +97,23 @@ public class RootController {
             .getResources()
             .entrySet()
             .stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, e -> new LinkObject(baseUrl + e.getValue(), e.getValue().contains("{"))));
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> toLink(baseUrl, e.getValue()), (a, b) -> a, LinkedHashMap::new));
 
         return Mono.just(ApiResponse.ok(new HypermediaResponse(links)));
+    }
+
+    /**
+     * Creates a {@link LinkObject} with an absolute URL for the given resource path. The link is marked as {@code templated} when the path contains
+     * at least one URI template variable.
+     *
+     * @param baseUrl the public base URL in the form {@code scheme://host[:port]}
+     * @param path the relative resource path, possibly a URI template (e.g. {@code /api/jobs/{jobId}})
+     * @return a {@link LinkObject} pointing to the resource
+     */
+    private LinkObject toLink(String baseUrl, String path) {
+        boolean templated = !new UriTemplate(path).getVariableNames().isEmpty();
+
+        return new LinkObject(baseUrl + path, templated);
     }
 
     /**
