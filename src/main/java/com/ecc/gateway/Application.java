@@ -13,8 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Entry point for the ECC Gateway Service. Bootstraps the Spring Boot application and declares the global OpenAPI definition (title, version,
- * contact, license) together with the HTTP Bearer JWT security scheme used
- * across all protected endpoints.
+ * contact, license) together with the HTTP Bearer JWT security scheme used across all protected endpoints.
  *
  * @author Damian Kuras
  * @version 1.0
@@ -37,9 +36,9 @@ public class Application {
     /**
      * Starts the Spring Boot application.
      *
-     * @param aArgs command-line arguments passed to the application
+     * @param args command-line arguments passed to the application
      */
-    public static void main(String[] aArgs) {
-        SpringApplication.run(Application.class, aArgs);
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
     }
 }

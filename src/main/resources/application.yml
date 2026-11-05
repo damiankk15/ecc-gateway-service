@@ -37,19 +37,19 @@ spring:
               filters:
                 - PreserveHostHeader
 
-            - id: company-service-docs
-              uri: http://company-service:8080
-              predicates:
-                - Path=/companies/v3/api-docs
-              filters:
-                - RewritePath=/companies/v3/api-docs, /v3/api-docs
-
             - id: job-service-docs
               uri: http://job-service:8080
               predicates:
                 - Path=/jobs/v3/api-docs
               filters:
                 - RewritePath=/jobs/v3/api-docs, /v3/api-docs
+
+            - id: company-service-docs
+              uri: http://company-service:8080
+              predicates:
+                - Path=/companies/v3/api-docs
+              filters:
+                - RewritePath=/companies/v3/api-docs, /v3/api-docs
 
   security:
     oauth2:
