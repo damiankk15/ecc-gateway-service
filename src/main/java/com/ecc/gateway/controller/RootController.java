@@ -49,7 +49,7 @@ public class RootController {
      * Returns an {@link ApiResponse} wrapping a {@link HypermediaResponse} that contains absolute hypermedia links for all configured API resources.
      * Links are returned in the order the resources are configured, and paths containing URI template variables (e.g. {@code {jobId}}) are marked as
      * {@code templated}. The base URL (scheme, host, port) is resolved from the incoming request, which reflects the public-facing address when
-     * forwarded headers are applied ({@code server.forward-headers-strategy=framework}).
+     * forwarded headers from a trusted proxy are applied ({@link com.ecc.gateway.web.TrustedProxyForwardedHeaderTransformer}).
      *
      * @param request the incoming HTTP request used to resolve the public base URL
      * @return a reactive {@link Mono} emitting the {@link ApiResponse} envelope containing the hypermedia link map
