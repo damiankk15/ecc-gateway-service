@@ -19,4 +19,6 @@ public enum ApiResponseStatus {
     BAD_CREDENTIALS,
     /** The caller is authenticated but not allowed to perform the request. */
     FORBIDDEN,
+    /** A downstream service the request was routed to cannot be reached. */
+    SERVICE_UNAVAILABLE,
 }
