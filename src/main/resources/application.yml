@@ -22,6 +22,9 @@ spring:
       server:
         webflux:
           trusted-proxies: 10\..*
+          httpclient:
+            connect-timeout: 3000
+            response-timeout: 30s
           routes:
             - id: job-api
               uri: ${JOB_SERVICE_URI:http://job-service:8080}
