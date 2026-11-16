@@ -51,6 +51,13 @@ public class TrustedProxyForwardedHeaderTransformer extends ForwardedHeaderTrans
         return removeOnlyTransformer.apply(request);
     }
 
+    /**
+     * Checks whether {@code request} comes directly from a trusted proxy, i.e. its remote host address fully matches the trusted proxies regular
+     * expression. A request without a known remote address is never trusted.
+     *
+     * @param request the incoming request
+     * @return {@code true} if the remote address is a trusted proxy, {@code false} otherwise
+     */
     private boolean isFromTrustedProxy(ServerHttpRequest request) {
         InetSocketAddress remoteAddress = request.getRemoteAddress();
 
