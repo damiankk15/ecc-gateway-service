@@ -2,6 +2,7 @@ package com.ecc.gateway.controller.testcase;
 
 import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 
+import com.ecc.gateway.config.properties.ApiResources;
 import com.ecc.gateway.dto.ApiResponse;
 import com.ecc.gateway.dto.HypermediaResponse;
 import com.ecc.gateway.dto.HypermediaResponse.LinkObject;
@@ -20,7 +21,7 @@ public record RootTestCase(
     // input
     ServerHttpRequest request,
     // mocked values
-    Map<String, String> mockedApiResources,
+    ApiResources mockedApiResources,
     // expected results
     ApiResponse<HypermediaResponse> expectedResponse
 ) {
@@ -57,7 +58,7 @@ public record RootTestCase(
     private static RootTestCase noConfiguredResourcesTestCase() {
         return RootTestCase.builder()
             .request(MockServerHttpRequest.get(LOCAL_BASE_URL_V + ROOT_PATH_V).build())
-            .mockedApiResources(Map.of())
+            .mockedApiResources(apiResources(Map.of()))
             .expectedResponse(ApiResponse.ok(new HypermediaResponse(Map.of())))
             .build();
     }
@@ -65,7 +66,7 @@ public record RootTestCase(
     private static RootTestCase singlePlainResourceTestCase() {
         return RootTestCase.builder()
             .request(MockServerHttpRequest.get(LOCAL_BASE_URL_V + ROOT_PATH_V).build())
-            .mockedApiResources(Map.of("jobs", JOBS_PATH_V))
+            .mockedApiResources(apiResources(Map.of("jobs", JOBS_PATH_V)))
             .expectedResponse(ApiResponse.ok(new HypermediaResponse(Map.of("jobs", new LinkObject(LOCAL_BASE_URL_V + JOBS_PATH_V)))))
             .build();
     }
@@ -73,7 +74,7 @@ public record RootTestCase(
     private static RootTestCase singleTemplatedResourceTestCase() {
         return RootTestCase.builder()
             .request(MockServerHttpRequest.get(LOCAL_BASE_URL_V + ROOT_PATH_V).build())
-            .mockedApiResources(Map.of("job", JOB_PATH_V))
+            .mockedApiResources(apiResources(Map.of("job", JOB_PATH_V)))
             .expectedResponse(ApiResponse.ok(new HypermediaResponse(Map.of("job", new LinkObject(LOCAL_BASE_URL_V + JOB_PATH_V, true)))))
             .build();
     }
@@ -81,7 +82,7 @@ public record RootTestCase(
     private static RootTestCase multipleTemplateVariablesTestCase() {
         return RootTestCase.builder()
             .request(MockServerHttpRequest.get(LOCAL_BASE_URL_V + ROOT_PATH_V).build())
-            .mockedApiResources(Map.of("jobLog", JOB_LOG_PATH_V))
+            .mockedApiResources(apiResources(Map.of("jobLog", JOB_LOG_PATH_V)))
             .expectedResponse(ApiResponse.ok(new HypermediaResponse(Map.of("jobLog", new LinkObject(LOCAL_BASE_URL_V + JOB_LOG_PATH_V, true)))))
             .build();
     }
@@ -118,14 +119,21 @@ public record RootTestCase(
             .build();
     }
 
-    private static Map<String, String> gatewayResources() {
+    private static ApiResources gatewayResources() {
         Map<String, String> resources = new LinkedHashMap<>();
         resources.put("jobs", JOBS_PATH_V);
         resources.put("job", JOB_PATH_V);
         resources.put("companies", COMPANIES_PATH_V);
         resources.put("markets", MARKETS_PATH_V);
 
-        return resources;
+        return apiResources(resources);
+    }
+
+    private static ApiResources apiResources(Map<String, String> resources) {
+        ApiResources apiResources = new ApiResources();
+        apiResources.setResources(resources);
+
+        return apiResources;
     }
 
     private static Map<String, LinkObject> gatewayLinks(String baseUrl) {

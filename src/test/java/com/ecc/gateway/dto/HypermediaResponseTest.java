@@ -20,6 +20,7 @@ class HypermediaResponseTest {
         HypermediaResponse hypermediaResponse = new HypermediaResponse(testCase.links());
 
         // then
+        assertEquals(testCase.expectedHypermediaResponse(), hypermediaResponse);
         assertEquals(List.copyOf(testCase.expectedHypermediaResponse().links().entrySet()), List.copyOf(hypermediaResponse.links().entrySet()));
     }
 }
