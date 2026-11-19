@@ -4,6 +4,7 @@ import static com.ecc.gateway.integration.support.TestHeaders.X_FORWARDED_PROTO_
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import com.ecc.gateway.integration.forwarding.testcase.UntrustedProxyRootLinksTestCase;
 import com.ecc.gateway.integration.forwarding.testcase.UntrustedProxyTestCase;
 import com.ecc.gateway.integration.support.AbstractGatewayIntegrationTest;
 import com.ecc.gateway.integration.support.stub.DownstreamStubs;
@@ -33,5 +34,19 @@ class UntrustedProxyIntegrationTest extends AbstractGatewayIntegrationTest {
         assertEquals(testCase.expectedStatus(), response.getStatus());
         assertNotNull(downstreamRequest, "Expected request to reach a downstream service");
         assertEquals(testCase.expectedForwardedProto(), downstreamRequest.headers().getFirst(X_FORWARDED_PROTO_F));
+    }
+
+    @DisplayName("[root] -> Should build hypermedia links from the request address and ignore spoofed forwarded headers from an untrusted address")
+    @ParameterizedTest(name = "[{index}] -> {argumentSetName}")
+    @ArgumentsSource(UntrustedProxyRootLinksTestCase.ArgumentsProvider.class)
+    void shouldIgnoreSpoofedForwardedHeadersInRootLinks(UntrustedProxyRootLinksTestCase testCase) {
+        // given
+
+        // when
+        EntityExchangeResult<String> response = exchange(HttpMethod.GET, "/api", testCase.requestHeaders());
+
+        // then
+        assertEquals(testCase.expectedStatus(), response.getStatus());
+        assertEquals(testCase.expectedBody(), response.getResponseBody());
     }
 }
