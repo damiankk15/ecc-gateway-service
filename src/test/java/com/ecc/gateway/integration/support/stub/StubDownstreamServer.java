@@ -1,5 +1,6 @@
 package com.ecc.gateway.integration.support.stub;
 
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.http.HttpHeaders;
 import reactor.core.publisher.Mono;
@@ -12,7 +13,7 @@ public final class StubDownstreamServer {
     private final DisposableServer server;
     private final AtomicReference<RecordedRequest> lastRequest = new AtomicReference<>();
 
-    private StubDownstreamServer(String name, String responseBody) {
+    private StubDownstreamServer(String name, String responseBody, Duration responseDelay) {
         this.name = name;
         this.server = HttpServer.create()
             .host("127.0.0.1")
@@ -22,13 +23,17 @@ public final class StubDownstreamServer {
                 request.requestHeaders().forEach(header -> headers.add(header.getKey(), header.getValue()));
                 lastRequest.set(new RecordedRequest(request.method().name(), request.uri(), headers));
 
-                return response.header(HttpHeaders.CONTENT_TYPE, "application/json").sendString(Mono.just(responseBody));
+                return response.header(HttpHeaders.CONTENT_TYPE, "application/json").sendString(Mono.just(responseBody).delayElement(responseDelay));
             })
             .bindNow();
     }
 
     public static StubDownstreamServer start(String name, String responseBody) {
-        return new StubDownstreamServer(name, responseBody);
+        return start(name, responseBody, Duration.ZERO);
+    }
+
+    public static StubDownstreamServer start(String name, String responseBody, Duration responseDelay) {
+        return new StubDownstreamServer(name, responseBody, responseDelay);
     }
 
     public String name() {
