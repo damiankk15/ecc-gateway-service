@@ -24,6 +24,12 @@ public record ForwardedHeadersTestCase(
     String expectedForwardedProto,
     String expectedForwardedHost
 ) {
+    private static final String JOBS_PATH_V = "/api/jobs";
+    private static final String COMPANIES_PATH_V = "/api/companies";
+
+    private static final String HTTPS_V = "https";
+    private static final String HTTP_V = "http";
+
     public static class ArgumentsProvider implements org.junit.jupiter.params.provider.ArgumentsProvider {
 
         @Override
@@ -38,20 +44,20 @@ public record ForwardedHeadersTestCase(
 
     private static ForwardedHeadersTestCase traefikHttpsToJobServiceTestCase() {
         return ForwardedHeadersTestCase.builder()
-            .path("/api/jobs")
+            .path(JOBS_PATH_V)
             .requestHeaders(traefikHttpsHeaders())
             .expectedStatus(HttpStatus.OK)
-            .expectedForwardedProto("https")
+            .expectedForwardedProto(HTTPS_V)
             .expectedForwardedHost(PUBLIC_HOST_V)
             .build();
     }
 
     private static ForwardedHeadersTestCase traefikHttpsToCompanyServiceTestCase() {
         return ForwardedHeadersTestCase.builder()
-            .path("/api/companies")
+            .path(COMPANIES_PATH_V)
             .requestHeaders(traefikHttpsHeaders())
             .expectedStatus(HttpStatus.OK)
-            .expectedForwardedProto("https")
+            .expectedForwardedProto(HTTPS_V)
             .expectedForwardedHost(PUBLIC_HOST_V)
             .build();
     }
@@ -61,10 +67,10 @@ public record ForwardedHeadersTestCase(
         headers.set(HttpHeaders.HOST, LOCAL_HOST_V);
 
         return ForwardedHeadersTestCase.builder()
-            .path("/api/jobs")
+            .path(JOBS_PATH_V)
             .requestHeaders(headers)
             .expectedStatus(HttpStatus.OK)
-            .expectedForwardedProto("http")
+            .expectedForwardedProto(HTTP_V)
             .expectedForwardedHost(LOCAL_HOST_V)
             .build();
     }

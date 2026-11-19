@@ -21,6 +21,7 @@ public final class TestHeaders {
     public static HttpHeaders bearerHeaders(String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(token);
+
         return headers;
     }
 
@@ -33,6 +34,7 @@ public final class TestHeaders {
         headers.set(X_FORWARDED_PROTO_F, "https");
         headers.set(X_FORWARDED_HOST_F, PUBLIC_HOST_V);
         headers.set(X_FORWARDED_PORT_F, "443");
+
         return headers;
     }
 }

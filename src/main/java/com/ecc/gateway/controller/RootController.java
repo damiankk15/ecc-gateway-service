@@ -97,7 +97,9 @@ public class RootController {
             .getResources()
             .entrySet()
             .stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, e -> toLink(baseUrl, e.getValue()), (a, b) -> a, LinkedHashMap::new));
+            .collect(
+                Collectors.toMap(Map.Entry::getKey, resource -> toLink(baseUrl, resource.getValue()), (first, duplicate) -> first, LinkedHashMap::new)
+            );
 
         return Mono.just(ApiResponse.ok(new HypermediaResponse(links)));
     }

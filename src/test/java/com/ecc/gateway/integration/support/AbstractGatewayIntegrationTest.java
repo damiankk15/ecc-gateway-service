@@ -33,12 +33,6 @@ public abstract class AbstractGatewayIntegrationTest {
     }
 
     protected EntityExchangeResult<String> exchange(HttpMethod method, String path, HttpHeaders requestHeaders) {
-        return webTestClient
-            .method(method)
-            .uri(path)
-            .headers(headers -> headers.addAll(requestHeaders))
-            .exchange()
-            .expectBody(String.class)
-            .returnResult();
+        return GatewayTestProperties.exchange(webTestClient, method, path, requestHeaders);
     }
 }

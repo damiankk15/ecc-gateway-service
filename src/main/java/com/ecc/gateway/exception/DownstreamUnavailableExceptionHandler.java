@@ -3,18 +3,17 @@ package com.ecc.gateway.exception;
 import com.ecc.gateway.dto.ApiError;
 import com.ecc.gateway.dto.ApiResponse;
 import com.ecc.gateway.dto.ApiResponseStatus;
+import com.ecc.gateway.web.ApiResponseWriter;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.util.List;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebExceptionHandler;
 import reactor.core.publisher.Mono;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * {@link WebExceptionHandler} that turns a failed connection to a downstream service into a {@code 503 Service Unavailable} response with an
@@ -33,15 +32,15 @@ public class DownstreamUnavailableExceptionHandler implements WebExceptionHandle
 
     private static final ApiError SERVICE_UNAVAILABLE_ERROR = new ApiError("SERVICE_UNAVAILABLE", "Service is temporarily unavailable", null);
 
-    private final JsonMapper jsonMapper;
+    private final ApiResponseWriter apiResponseWriter;
 
     /**
-     * Creates a new {@link DownstreamUnavailableExceptionHandler} that writes response bodies with the application's {@link JsonMapper}.
+     * Creates a new {@link DownstreamUnavailableExceptionHandler} that writes response bodies with the given {@link ApiResponseWriter}.
      *
-     * @param jsonMapper mapper used to serialize the {@link ApiResponse} error body
+     * @param apiResponseWriter writer used to serialize the {@link ApiResponse} error body
      */
-    public DownstreamUnavailableExceptionHandler(JsonMapper jsonMapper) {
-        this.jsonMapper = jsonMapper;
+    public DownstreamUnavailableExceptionHandler(ApiResponseWriter apiResponseWriter) {
+        this.apiResponseWriter = apiResponseWriter;
     }
 
     /**
@@ -60,12 +59,9 @@ public class DownstreamUnavailableExceptionHandler implements WebExceptionHandle
             return Mono.error(exception);
         }
 
-        byte[] body = jsonMapper.writeValueAsBytes(ApiResponse.error(ApiResponseStatus.SERVICE_UNAVAILABLE, List.of(SERVICE_UNAVAILABLE_ERROR)));
-
         response.setStatusCode(HttpStatus.SERVICE_UNAVAILABLE);
-        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-        return response.writeWith(Mono.just(response.bufferFactory().wrap(body)));
+        return apiResponseWriter.write(response, ApiResponse.error(ApiResponseStatus.SERVICE_UNAVAILABLE, List.of(SERVICE_UNAVAILABLE_ERROR)));
     }
 
     /**

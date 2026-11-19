@@ -20,6 +20,10 @@ public record UntrustedProxyTestCase(
     HttpStatus expectedStatus,
     String expectedForwardedProto
 ) {
+    private static final String JOBS_PATH_V = "/api/jobs";
+
+    private static final String HTTP_V = "http";
+
     public static class ArgumentsProvider implements org.junit.jupiter.params.provider.ArgumentsProvider {
 
         @Override
@@ -30,10 +34,10 @@ public record UntrustedProxyTestCase(
 
     private static UntrustedProxyTestCase spoofedHttpsHeadersTestCase() {
         return UntrustedProxyTestCase.builder()
-            .path("/api/jobs")
+            .path(JOBS_PATH_V)
             .requestHeaders(traefikHttpsHeaders())
             .expectedStatus(HttpStatus.OK)
-            .expectedForwardedProto("http")
+            .expectedForwardedProto(HTTP_V)
             .build();
     }
 }

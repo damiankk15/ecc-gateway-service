@@ -43,7 +43,7 @@ class UntrustedProxyIntegrationTest extends AbstractGatewayIntegrationTest {
         // given
 
         // when
-        EntityExchangeResult<String> response = exchange(HttpMethod.GET, "/api", testCase.requestHeaders());
+        EntityExchangeResult<String> response = exchange(HttpMethod.GET, testCase.path(), testCase.requestHeaders());
 
         // then
         assertEquals(testCase.expectedStatus(), response.getStatus());

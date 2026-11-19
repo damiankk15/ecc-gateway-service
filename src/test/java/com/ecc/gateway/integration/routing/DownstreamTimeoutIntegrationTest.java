@@ -12,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
@@ -46,15 +47,15 @@ class DownstreamTimeoutIntegrationTest {
         // given
 
         // when
-        EntityExchangeResult<byte[]> response = webTestClient
-            .get()
-            .uri(testCase.path())
-            .headers(headers -> headers.addAll(testCase.requestHeaders()))
-            .exchange()
-            .expectBody()
-            .returnResult();
+        EntityExchangeResult<String> response = GatewayTestProperties.exchange(
+            webTestClient,
+            HttpMethod.GET,
+            testCase.path(),
+            testCase.requestHeaders()
+        );
 
         // then
         assertEquals(testCase.expectedStatus(), response.getStatus());
+        assertEquals(testCase.expectedBody(), response.getResponseBody());
     }
 }

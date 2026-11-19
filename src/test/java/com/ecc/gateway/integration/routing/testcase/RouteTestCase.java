@@ -24,8 +24,24 @@ public record RouteTestCase(
     HttpHeaders requestHeaders,
     // expected results
     HttpStatus expectedStatus,
+    String expectedBody,
     DownstreamCall expectedDownstreamCall
 ) {
+    private static final String UNKNOWN_API_PATH_V = "/api/unknown";
+    private static final String JOBS_WITHOUT_API_PREFIX_PATH_V = "/jobs";
+    private static final String JOBS_PATH_V = "/api/jobs";
+    private static final String JOB_PATH_V = "/api/jobs/42";
+    private static final String JOBS_WITH_QUERY_PATH_V = "/api/jobs?page=1&size=20";
+    private static final String COMPANIES_PATH_V = "/api/companies";
+    private static final String COMPANY_EVALUATION_PATH_V = "/api/companies/1/evaluation?year=2025";
+    private static final String MARKETS_PATH_V = "/api/markets";
+    private static final String JOB_SERVICE_DOCS_PATH_V = "/jobs/v3/api-docs";
+    private static final String COMPANY_SERVICE_DOCS_PATH_V = "/companies/v3/api-docs";
+    private static final String DOWNSTREAM_DOCS_PATH_V = "/v3/api-docs";
+
+    private static final String NOT_FOUND_BODY_V =
+        "{\"status\":\"NOT_FOUND_ERROR\",\"data\":null,\"errors\":[{\"code\":\"NOT_FOUND\",\"message\":\"Resource not found\"}]}";
+
     public static class ArgumentsProvider implements org.junit.jupiter.params.provider.ArgumentsProvider {
 
         @Override
@@ -49,43 +65,43 @@ public record RouteTestCase(
     }
 
     private static RouteTestCase unknownApiPathTestCase() {
-        return notRouted("/api/unknown");
+        return notRouted(UNKNOWN_API_PATH_V);
     }
 
     private static RouteTestCase servicePathWithoutApiPrefixTestCase() {
-        return notRouted("/jobs");
+        return notRouted(JOBS_WITHOUT_API_PREFIX_PATH_V);
     }
 
     private static RouteTestCase jobListTestCase() {
-        return apiRoute("/api/jobs", DownstreamStubs.JOB_SERVICE, "/api/jobs");
+        return apiRoute(JOBS_PATH_V, DownstreamStubs.JOB_SERVICE, JOBS_PATH_V);
     }
 
     private static RouteTestCase singleJobTestCase() {
-        return apiRoute("/api/jobs/42", DownstreamStubs.JOB_SERVICE, "/api/jobs/42");
+        return apiRoute(JOB_PATH_V, DownstreamStubs.JOB_SERVICE, JOB_PATH_V);
     }
 
     private static RouteTestCase jobListWithQueryStringTestCase() {
-        return apiRoute("/api/jobs?page=1&size=20", DownstreamStubs.JOB_SERVICE, "/api/jobs?page=1&size=20");
+        return apiRoute(JOBS_WITH_QUERY_PATH_V, DownstreamStubs.JOB_SERVICE, JOBS_WITH_QUERY_PATH_V);
     }
 
     private static RouteTestCase companyListTestCase() {
-        return apiRoute("/api/companies", DownstreamStubs.COMPANY_SERVICE, "/api/companies");
+        return apiRoute(COMPANIES_PATH_V, DownstreamStubs.COMPANY_SERVICE, COMPANIES_PATH_V);
     }
 
     private static RouteTestCase companyEvaluationTestCase() {
-        return apiRoute("/api/companies/1/evaluation?year=2025", DownstreamStubs.COMPANY_SERVICE, "/api/companies/1/evaluation?year=2025");
+        return apiRoute(COMPANY_EVALUATION_PATH_V, DownstreamStubs.COMPANY_SERVICE, COMPANY_EVALUATION_PATH_V);
     }
 
     private static RouteTestCase marketListTestCase() {
-        return apiRoute("/api/markets", DownstreamStubs.COMPANY_SERVICE, "/api/markets");
+        return apiRoute(MARKETS_PATH_V, DownstreamStubs.COMPANY_SERVICE, MARKETS_PATH_V);
     }
 
     private static RouteTestCase jobServiceApiDocsTestCase() {
-        return docsRoute("/jobs/v3/api-docs", DownstreamStubs.JOB_SERVICE);
+        return docsRoute(JOB_SERVICE_DOCS_PATH_V, DownstreamStubs.JOB_SERVICE);
     }
 
     private static RouteTestCase companyServiceApiDocsTestCase() {
-        return docsRoute("/companies/v3/api-docs", DownstreamStubs.COMPANY_SERVICE);
+        return docsRoute(COMPANY_SERVICE_DOCS_PATH_V, DownstreamStubs.COMPANY_SERVICE);
     }
 
     private static RouteTestCase notRouted(String path) {
@@ -93,6 +109,7 @@ public record RouteTestCase(
             .path(path)
             .requestHeaders(publicHostHeaders(TestJwtIssuer.validToken()))
             .expectedStatus(HttpStatus.NOT_FOUND)
+            .expectedBody(NOT_FOUND_BODY_V)
             .build();
     }
 
@@ -103,6 +120,7 @@ public record RouteTestCase(
             .path(path)
             .requestHeaders(publicHostHeaders(token))
             .expectedStatus(HttpStatus.OK)
+            .expectedBody(service.responseBody())
             .expectedDownstreamCall(
                 DownstreamCall.builder()
                     .service(service.name())
@@ -119,7 +137,8 @@ public record RouteTestCase(
             .path(path)
             .requestHeaders(noHeaders())
             .expectedStatus(HttpStatus.OK)
-            .expectedDownstreamCall(DownstreamCall.builder().service(service.name()).uri("/v3/api-docs").host(service.hostAndPort()).build())
+            .expectedBody(service.responseBody())
+            .expectedDownstreamCall(DownstreamCall.builder().service(service.name()).uri(DOWNSTREAM_DOCS_PATH_V).host(service.hostAndPort()).build())
             .build();
     }
 

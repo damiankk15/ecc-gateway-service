@@ -24,6 +24,7 @@ class RoutingIntegrationTest extends AbstractGatewayIntegrationTest {
 
         // then
         assertEquals(testCase.expectedStatus(), response.getStatus());
+        assertEquals(testCase.expectedBody(), response.getResponseBody());
         assertEquals(testCase.expectedDownstreamCall(), DownstreamStubs.lastCall());
     }
 }

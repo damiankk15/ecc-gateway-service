@@ -2,7 +2,10 @@ package com.ecc.gateway.integration.support;
 
 import com.ecc.gateway.integration.support.jwt.TestJwtIssuer;
 import com.ecc.gateway.integration.support.stub.DownstreamStubs;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 public final class GatewayTestProperties {
@@ -23,5 +26,15 @@ public final class GatewayTestProperties {
         return WebTestClient.bindToServer()
             .baseUrl("http://127.0.0.1:" + port)
             .build();
+    }
+
+    public static EntityExchangeResult<String> exchange(WebTestClient webTestClient, HttpMethod method, String path, HttpHeaders requestHeaders) {
+        return webTestClient
+            .method(method)
+            .uri(path)
+            .headers(headers -> headers.addAll(requestHeaders))
+            .exchange()
+            .expectBody(String.class)
+            .returnResult();
     }
 }

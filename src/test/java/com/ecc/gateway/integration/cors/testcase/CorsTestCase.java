@@ -27,6 +27,9 @@ public record CorsTestCase(
 ) {
     private static final String FOREIGN_ORIGIN_V = "https://evil.test";
 
+    private static final String JOBS_PATH_V = "/api/jobs";
+    private static final String JOB_PATH_V = "/api/jobs/42";
+
     public static class ArgumentsProvider implements org.junit.jupiter.params.provider.ArgumentsProvider {
 
         @Override
@@ -48,7 +51,7 @@ public record CorsTestCase(
     private static CorsTestCase preflightFromForeignOriginTestCase() {
         return CorsTestCase.builder()
             .method(HttpMethod.OPTIONS)
-            .path("/api/jobs")
+            .path(JOBS_PATH_V)
             .requestHeaders(preflightHeaders(FOREIGN_ORIGIN_V, HttpMethod.GET))
             .expectedStatus(HttpStatus.FORBIDDEN)
             .build();
@@ -57,7 +60,7 @@ public record CorsTestCase(
     private static CorsTestCase preflightWithNotAllowedMethodTestCase() {
         return CorsTestCase.builder()
             .method(HttpMethod.OPTIONS)
-            .path("/api/jobs")
+            .path(JOBS_PATH_V)
             .requestHeaders(preflightHeaders(ALLOWED_ORIGIN_V, HttpMethod.TRACE))
             .expectedStatus(HttpStatus.FORBIDDEN)
             .build();
@@ -67,13 +70,13 @@ public record CorsTestCase(
         HttpHeaders headers = validTokenHeaders();
         headers.setOrigin(FOREIGN_ORIGIN_V);
 
-        return CorsTestCase.builder().method(HttpMethod.GET).path("/api/jobs").requestHeaders(headers).expectedStatus(HttpStatus.FORBIDDEN).build();
+        return CorsTestCase.builder().method(HttpMethod.GET).path(JOBS_PATH_V).requestHeaders(headers).expectedStatus(HttpStatus.FORBIDDEN).build();
     }
 
     private static CorsTestCase preflightGetTestCase() {
         return CorsTestCase.builder()
             .method(HttpMethod.OPTIONS)
-            .path("/api/jobs")
+            .path(JOBS_PATH_V)
             .requestHeaders(preflightHeaders(ALLOWED_ORIGIN_V, HttpMethod.GET))
             .expectedStatus(HttpStatus.OK)
             .expectedAllowOrigin(ALLOWED_ORIGIN_V)
@@ -83,7 +86,7 @@ public record CorsTestCase(
     private static CorsTestCase preflightDeleteTestCase() {
         return CorsTestCase.builder()
             .method(HttpMethod.OPTIONS)
-            .path("/api/jobs/42")
+            .path(JOB_PATH_V)
             .requestHeaders(preflightHeaders(ALLOWED_ORIGIN_V, HttpMethod.DELETE))
             .expectedStatus(HttpStatus.OK)
             .expectedAllowOrigin(ALLOWED_ORIGIN_V)
@@ -96,7 +99,7 @@ public record CorsTestCase(
 
         return CorsTestCase.builder()
             .method(HttpMethod.GET)
-            .path("/api/jobs")
+            .path(JOBS_PATH_V)
             .requestHeaders(headers)
             .expectedStatus(HttpStatus.OK)
             .expectedAllowOrigin(ALLOWED_ORIGIN_V)
@@ -109,6 +112,7 @@ public record CorsTestCase(
         headers.setOrigin(origin);
         headers.setAccessControlRequestMethod(requestMethod);
         headers.set(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, HttpHeaders.AUTHORIZATION);
+
         return headers;
     }
 }

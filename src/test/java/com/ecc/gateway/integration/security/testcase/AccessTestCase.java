@@ -24,6 +24,21 @@ public record AccessTestCase(
     boolean expectedBearerChallenge,
     long expectedDownstreamRequests
 ) {
+    private static final String API_ROOT_PATH_V = "/api";
+    private static final String JOBS_PATH_V = "/api/jobs";
+    private static final String COMPANIES_PATH_V = "/api/companies";
+    private static final String MARKETS_PATH_V = "/api/markets";
+    private static final String ACTUATOR_ENV_PATH_V = "/actuator/env";
+    private static final String HEALTHZ_PATH_V = "/actuator/healthz";
+    private static final String UNKNOWN_PATH_V = "/unknown";
+    private static final String HEALTH_PATH_V = "/actuator/health";
+    private static final String GATEWAY_DOCS_PATH_V = "/v3/api-docs";
+    private static final String SWAGGER_UI_PATH_V = "/swagger-ui.html";
+    private static final String JOB_SERVICE_DOCS_PATH_V = "/jobs/v3/api-docs";
+    private static final String COMPANY_SERVICE_DOCS_PATH_V = "/companies/v3/api-docs";
+
+    private static final String MALFORMED_TOKEN_V = "not-a-jwt";
+
     public static class ArgumentsProvider implements org.junit.jupiter.params.provider.ArgumentsProvider {
 
         @Override
@@ -56,67 +71,67 @@ public record AccessTestCase(
     }
 
     private static AccessTestCase apiRootWithoutTokenTestCase() {
-        return unauthorized("/api", noHeaders());
+        return unauthorized(API_ROOT_PATH_V, noHeaders());
     }
 
     private static AccessTestCase jobsWithoutTokenTestCase() {
-        return unauthorized("/api/jobs", noHeaders());
+        return unauthorized(JOBS_PATH_V, noHeaders());
     }
 
     private static AccessTestCase companiesWithoutTokenTestCase() {
-        return unauthorized("/api/companies", noHeaders());
+        return unauthorized(COMPANIES_PATH_V, noHeaders());
     }
 
     private static AccessTestCase notPublicActuatorEndpointTestCase() {
-        return unauthorized("/actuator/env", noHeaders());
+        return unauthorized(ACTUATOR_ENV_PATH_V, noHeaders());
     }
 
     private static AccessTestCase pathResemblingHealthTestCase() {
-        return unauthorized("/actuator/healthz", noHeaders());
+        return unauthorized(HEALTHZ_PATH_V, noHeaders());
     }
 
     private static AccessTestCase unknownPathTestCase() {
-        return unauthorized("/unknown", noHeaders());
+        return unauthorized(UNKNOWN_PATH_V, noHeaders());
     }
 
     private static AccessTestCase expiredTokenTestCase() {
-        return unauthorized("/api", bearerHeaders(TestJwtIssuer.expiredToken()));
+        return unauthorized(API_ROOT_PATH_V, bearerHeaders(TestJwtIssuer.expiredToken()));
     }
 
     private static AccessTestCase foreignIssuerTokenTestCase() {
-        return unauthorized("/api", bearerHeaders(TestJwtIssuer.foreignIssuerToken()));
+        return unauthorized(API_ROOT_PATH_V, bearerHeaders(TestJwtIssuer.foreignIssuerToken()));
     }
 
     private static AccessTestCase foreignKeyTokenTestCase() {
-        return unauthorized("/api", bearerHeaders(TestJwtIssuer.foreignKeyToken()));
+        return unauthorized(API_ROOT_PATH_V, bearerHeaders(TestJwtIssuer.foreignKeyToken()));
     }
 
     private static AccessTestCase malformedTokenTestCase() {
-        return unauthorized("/api", bearerHeaders("not-a-jwt"));
+        return unauthorized(API_ROOT_PATH_V, bearerHeaders(MALFORMED_TOKEN_V));
     }
 
     private static AccessTestCase tokenWithoutBearerPrefixTestCase() {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, TestJwtIssuer.validToken());
 
-        return unauthorized("/api", headers);
+        return unauthorized(API_ROOT_PATH_V, headers);
     }
 
     private static AccessTestCase healthWithoutTokenTestCase() {
-        return AccessTestCase.builder().path("/actuator/health").requestHeaders(noHeaders()).expectedStatus(HttpStatus.OK).build();
+        return AccessTestCase.builder().path(HEALTH_PATH_V).requestHeaders(noHeaders()).expectedStatus(HttpStatus.OK).build();
     }
 
     private static AccessTestCase gatewayApiDocsWithoutTokenTestCase() {
-        return AccessTestCase.builder().path("/v3/api-docs").requestHeaders(noHeaders()).expectedStatus(HttpStatus.OK).build();
+        return AccessTestCase.builder().path(GATEWAY_DOCS_PATH_V).requestHeaders(noHeaders()).expectedStatus(HttpStatus.OK).build();
     }
 
     private static AccessTestCase swaggerUiWithoutTokenTestCase() {
-        return AccessTestCase.builder().path("/swagger-ui.html").requestHeaders(noHeaders()).expectedStatus(HttpStatus.FOUND).build();
+        return AccessTestCase.builder().path(SWAGGER_UI_PATH_V).requestHeaders(noHeaders()).expectedStatus(HttpStatus.FOUND).build();
     }
 
     private static AccessTestCase jobServiceApiDocsWithoutTokenTestCase() {
         return AccessTestCase.builder()
-            .path("/jobs/v3/api-docs")
+            .path(JOB_SERVICE_DOCS_PATH_V)
             .requestHeaders(noHeaders())
             .expectedStatus(HttpStatus.OK)
             .expectedDownstreamRequests(1)
@@ -125,7 +140,7 @@ public record AccessTestCase(
 
     private static AccessTestCase companyServiceApiDocsWithoutTokenTestCase() {
         return AccessTestCase.builder()
-            .path("/companies/v3/api-docs")
+            .path(COMPANY_SERVICE_DOCS_PATH_V)
             .requestHeaders(noHeaders())
             .expectedStatus(HttpStatus.OK)
             .expectedDownstreamRequests(1)
@@ -133,12 +148,12 @@ public record AccessTestCase(
     }
 
     private static AccessTestCase apiRootWithValidTokenTestCase() {
-        return AccessTestCase.builder().path("/api").requestHeaders(validTokenHeaders()).expectedStatus(HttpStatus.OK).build();
+        return AccessTestCase.builder().path(API_ROOT_PATH_V).requestHeaders(validTokenHeaders()).expectedStatus(HttpStatus.OK).build();
     }
 
     private static AccessTestCase jobsWithValidTokenTestCase() {
         return AccessTestCase.builder()
-            .path("/api/jobs")
+            .path(JOBS_PATH_V)
             .requestHeaders(validTokenHeaders())
             .expectedStatus(HttpStatus.OK)
             .expectedDownstreamRequests(1)
@@ -147,7 +162,7 @@ public record AccessTestCase(
 
     private static AccessTestCase marketsWithValidTokenTestCase() {
         return AccessTestCase.builder()
-            .path("/api/markets")
+            .path(MARKETS_PATH_V)
             .requestHeaders(validTokenHeaders())
             .expectedStatus(HttpStatus.OK)
             .expectedDownstreamRequests(1)

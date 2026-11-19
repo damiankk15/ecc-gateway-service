@@ -20,6 +20,9 @@ public record DownstreamUnavailableTestCase(
     HttpStatus expectedStatus,
     String expectedBody
 ) {
+    private static final String JOBS_PATH_V = "/api/jobs";
+    private static final String COMPANIES_PATH_V = "/api/companies";
+
     private static final String SERVICE_UNAVAILABLE_BODY_V =
         "{\"status\":\"SERVICE_UNAVAILABLE\",\"data\":null,\"errors\":[{\"code\":\"SERVICE_UNAVAILABLE\",\"message\":\"Service is temporarily unavailable\"}]}";
 
@@ -36,7 +39,7 @@ public record DownstreamUnavailableTestCase(
 
     private static DownstreamUnavailableTestCase jobServiceDownTestCase() {
         return DownstreamUnavailableTestCase.builder()
-            .path("/api/jobs")
+            .path(JOBS_PATH_V)
             .requestHeaders(validTokenHeaders())
             .expectedStatus(HttpStatus.SERVICE_UNAVAILABLE)
             .expectedBody(SERVICE_UNAVAILABLE_BODY_V)
@@ -45,7 +48,7 @@ public record DownstreamUnavailableTestCase(
 
     private static DownstreamUnavailableTestCase companyServiceDownTestCase() {
         return DownstreamUnavailableTestCase.builder()
-            .path("/api/companies")
+            .path(COMPANIES_PATH_V)
             .requestHeaders(validTokenHeaders())
             .expectedStatus(HttpStatus.SERVICE_UNAVAILABLE)
             .expectedBody(SERVICE_UNAVAILABLE_BODY_V)

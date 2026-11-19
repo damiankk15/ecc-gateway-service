@@ -17,8 +17,15 @@ public record DownstreamTimeoutTestCase(
     String path,
     HttpHeaders requestHeaders,
     // expected results
-    HttpStatus expectedStatus
+    HttpStatus expectedStatus,
+    String expectedBody
 ) {
+    private static final String JOBS_PATH_V = "/api/jobs";
+    private static final String COMPANIES_PATH_V = "/api/companies";
+
+    private static final String GATEWAY_TIMEOUT_BODY_V =
+        "{\"status\":\"SERVICE_UNAVAILABLE\",\"data\":null,\"errors\":[{\"code\":\"GATEWAY_TIMEOUT\",\"message\":\"Service did not respond in time\"}]}";
+
     public static class ArgumentsProvider implements org.junit.jupiter.params.provider.ArgumentsProvider {
 
         @Override
@@ -31,18 +38,19 @@ public record DownstreamTimeoutTestCase(
     }
 
     private static DownstreamTimeoutTestCase jobServiceTooSlowTestCase() {
-        return DownstreamTimeoutTestCase.builder()
-            .path("/api/jobs")
-            .requestHeaders(validTokenHeaders())
-            .expectedStatus(HttpStatus.GATEWAY_TIMEOUT)
-            .build();
+        return gatewayTimeout(JOBS_PATH_V);
     }
 
     private static DownstreamTimeoutTestCase companyServiceTooSlowTestCase() {
+        return gatewayTimeout(COMPANIES_PATH_V);
+    }
+
+    private static DownstreamTimeoutTestCase gatewayTimeout(String path) {
         return DownstreamTimeoutTestCase.builder()
-            .path("/api/companies")
+            .path(path)
             .requestHeaders(validTokenHeaders())
             .expectedStatus(HttpStatus.GATEWAY_TIMEOUT)
+            .expectedBody(GATEWAY_TIMEOUT_BODY_V)
             .build();
     }
 }

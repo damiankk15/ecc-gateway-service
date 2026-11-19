@@ -24,6 +24,6 @@ class RootControllerTest {
 
         // then
         assertEquals(testCase.expectedResponse(), response);
-        assertEquals(List.copyOf(testCase.expectedResponse().data().links().keySet()), List.copyOf(response.data().links().keySet()));
+        assertEquals(List.copyOf(testCase.expectedResponse().data().links().entrySet()), List.copyOf(response.data().links().entrySet()));
     }
 }

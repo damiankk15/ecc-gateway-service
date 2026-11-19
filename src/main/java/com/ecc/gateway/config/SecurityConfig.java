@@ -1,6 +1,7 @@
 package com.ecc.gateway.config;
 
 import com.ecc.gateway.config.properties.CorsProperties;
+import com.ecc.gateway.security.ApiErrorSecurityHandler;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +15,8 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 /**
  * Security configuration for the Spring WebFlux Gateway API. Disables CSRF, configures CORS from {@link CorsProperties}, and enforces JWT-based
- * OAuth2 resource server authentication on all exchanges except the publicly accessible paths.
+ * OAuth2 resource server authentication on all exchanges except the publicly accessible paths. Rejected requests get an {@code ApiResponse} error
+ * body from {@link ApiErrorSecurityHandler}.
  *
  * @author Damian Kuras
  * @version 1.0
@@ -25,14 +27,17 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final CorsProperties corsProperties;
+    private final ApiErrorSecurityHandler apiErrorSecurityHandler;
 
     /**
-     * Creates a new {@link SecurityConfig} with the provided {@link CorsProperties}.
+     * Creates a new {@link SecurityConfig} with the provided {@link CorsProperties} and {@link ApiErrorSecurityHandler}.
      *
      * @param corsProperties CORS settings resolved from {@code application.yml}
+     * @param apiErrorSecurityHandler handler writing the {@code ApiResponse} error body of rejected requests
      */
-    public SecurityConfig(CorsProperties corsProperties) {
+    public SecurityConfig(CorsProperties corsProperties, ApiErrorSecurityHandler apiErrorSecurityHandler) {
         this.corsProperties = corsProperties;
+        this.apiErrorSecurityHandler = apiErrorSecurityHandler;
     }
 
     /**
@@ -59,7 +64,8 @@ public class SecurityConfig {
     /**
      * Configures the reactive Spring Security filter chain for the Gateway API. Health and info actuator endpoints, Swagger UI and the OpenAPI
      * documents of the Gateway and downstream services are publicly accessible; every other exchange requires a valid JWT bearer token issued by
-     * Keycloak. CSRF protection is disabled because the API is stateless and does not use cookie-based authentication.
+     * Keycloak. Requests without a valid token ({@code 401}) or without access ({@code 403}) are rejected with an {@code ApiResponse} error body.
+     * CSRF protection is disabled because the API is stateless and does not use cookie-based authentication.
      *
      * @param http the {@link ServerHttpSecurity} builder used to configure WebFlux security
      * @return a configured {@link SecurityWebFilterChain} instance
@@ -78,14 +84,19 @@ public class SecurityConfig {
                         "/swagger-ui/**",
                         "/webjars/swagger-ui/**",
                         "/v3/api-docs/**",
-                        "/jobs/v3/api-docs/**",
-                        "/companies/v3/api-docs/**"
+                        "/jobs/v3/api-docs",
+                        "/companies/v3/api-docs"
                     )
                     .permitAll()
                     .anyExchange()
                     .authenticated()
             )
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+            .exceptionHandling(exceptions ->
+                exceptions.authenticationEntryPoint(apiErrorSecurityHandler).accessDeniedHandler(apiErrorSecurityHandler)
+            )
+            .oauth2ResourceServer(oauth2 ->
+                oauth2.jwt(Customizer.withDefaults()).authenticationEntryPoint(apiErrorSecurityHandler).accessDeniedHandler(apiErrorSecurityHandler)
+            )
             .build();
     }
 }

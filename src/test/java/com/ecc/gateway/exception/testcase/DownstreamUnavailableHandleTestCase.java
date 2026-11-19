@@ -18,22 +18,20 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.support.ParameterDeclarations;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 
 @Builder
-public record HandleTestCase(
+public record DownstreamUnavailableHandleTestCase(
     // input
     ServerWebExchange exchange,
     Throwable exception,
     // expected results
     Outcome<Void> expectedOutcome,
     HttpStatus expectedStatus,
-    MediaType expectedContentType,
-    List<Object> expectedWrittenBodies
+    List<ApiResponse<?>> expectedWrittenBodies
 ) {
     private static final String JOBS_URL_V = "http://ecc-api.local/api/jobs";
     private static final String CONNECTION_REFUSED_R = "Connection refused: /127.0.0.1:1";
@@ -65,8 +63,8 @@ public record HandleTestCase(
         }
     }
 
-    private static HandleTestCase unrelatedExceptionTestCase() {
-        return HandleTestCase.builder()
+    private static DownstreamUnavailableHandleTestCase unrelatedExceptionTestCase() {
+        return DownstreamUnavailableHandleTestCase.builder()
             .exchange(jobsExchange())
             .exception(new IllegalStateException(UNEXPECTED_R))
             .expectedOutcome(thrown(IllegalStateException.class, UNEXPECTED_R))
@@ -74,8 +72,8 @@ public record HandleTestCase(
             .build();
     }
 
-    private static HandleTestCase gatewayTimeoutTestCase() {
-        return HandleTestCase.builder()
+    private static DownstreamUnavailableHandleTestCase gatewayTimeoutTestCase() {
+        return DownstreamUnavailableHandleTestCase.builder()
             .exchange(jobsExchange())
             .exception(new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT))
             .expectedOutcome(thrown(ResponseStatusException.class, "504 GATEWAY_TIMEOUT"))
@@ -83,11 +81,11 @@ public record HandleTestCase(
             .build();
     }
 
-    private static HandleTestCase committedResponseTestCase() {
+    private static DownstreamUnavailableHandleTestCase committedResponseTestCase() {
         ServerWebExchange exchange = jobsExchange();
         exchange.getResponse().setComplete().block();
 
-        return HandleTestCase.builder()
+        return DownstreamUnavailableHandleTestCase.builder()
             .exchange(exchange)
             .exception(new IllegalStateException(UNEXPECTED_R, new ConnectException(CONNECTION_REFUSED_R)))
             .expectedOutcome(thrown(IllegalStateException.class, UNEXPECTED_R))
@@ -95,46 +93,28 @@ public record HandleTestCase(
             .build();
     }
 
-    private static HandleTestCase connectionRefusedTestCase() {
-        return HandleTestCase.builder()
-            .exchange(jobsExchange())
-            .exception(new ConnectException(CONNECTION_REFUSED_R))
-            .expectedOutcome(returned(null))
-            .expectedStatus(HttpStatus.SERVICE_UNAVAILABLE)
-            .expectedContentType(MediaType.APPLICATION_JSON)
-            .expectedWrittenBodies(List.of(SERVICE_UNAVAILABLE_RESPONSE_V))
-            .build();
+    private static DownstreamUnavailableHandleTestCase connectionRefusedTestCase() {
+        return serviceUnavailable(new ConnectException(CONNECTION_REFUSED_R));
     }
 
-    private static HandleTestCase connectTimeoutTestCase() {
-        return HandleTestCase.builder()
-            .exchange(jobsExchange())
-            .exception(new ConnectTimeoutException(CONNECT_TIMEOUT_R))
-            .expectedOutcome(returned(null))
-            .expectedStatus(HttpStatus.SERVICE_UNAVAILABLE)
-            .expectedContentType(MediaType.APPLICATION_JSON)
-            .expectedWrittenBodies(List.of(SERVICE_UNAVAILABLE_RESPONSE_V))
-            .build();
+    private static DownstreamUnavailableHandleTestCase connectTimeoutTestCase() {
+        return serviceUnavailable(new ConnectTimeoutException(CONNECT_TIMEOUT_R));
     }
 
-    private static HandleTestCase unknownHostTestCase() {
-        return HandleTestCase.builder()
-            .exchange(jobsExchange())
-            .exception(new UnknownHostException(UNKNOWN_HOST_R))
-            .expectedOutcome(returned(null))
-            .expectedStatus(HttpStatus.SERVICE_UNAVAILABLE)
-            .expectedContentType(MediaType.APPLICATION_JSON)
-            .expectedWrittenBodies(List.of(SERVICE_UNAVAILABLE_RESPONSE_V))
-            .build();
+    private static DownstreamUnavailableHandleTestCase unknownHostTestCase() {
+        return serviceUnavailable(new UnknownHostException(UNKNOWN_HOST_R));
     }
 
-    private static HandleTestCase wrappedConnectionRefusedTestCase() {
-        return HandleTestCase.builder()
+    private static DownstreamUnavailableHandleTestCase wrappedConnectionRefusedTestCase() {
+        return serviceUnavailable(new IllegalStateException(UNEXPECTED_R, new ConnectException(CONNECTION_REFUSED_R)));
+    }
+
+    private static DownstreamUnavailableHandleTestCase serviceUnavailable(Throwable exception) {
+        return DownstreamUnavailableHandleTestCase.builder()
             .exchange(jobsExchange())
-            .exception(new IllegalStateException(UNEXPECTED_R, new ConnectException(CONNECTION_REFUSED_R)))
+            .exception(exception)
             .expectedOutcome(returned(null))
             .expectedStatus(HttpStatus.SERVICE_UNAVAILABLE)
-            .expectedContentType(MediaType.APPLICATION_JSON)
             .expectedWrittenBodies(List.of(SERVICE_UNAVAILABLE_RESPONSE_V))
             .build();
     }

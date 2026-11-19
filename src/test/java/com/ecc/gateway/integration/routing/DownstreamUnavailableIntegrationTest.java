@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.ecc.gateway.integration.routing.testcase.DownstreamUnavailableTestCase;
 import com.ecc.gateway.integration.support.GatewayTestProperties;
-import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
@@ -44,16 +44,15 @@ class DownstreamUnavailableIntegrationTest {
         // given
 
         // when
-        EntityExchangeResult<byte[]> response = webTestClient
-            .get()
-            .uri(testCase.path())
-            .headers(headers -> headers.addAll(testCase.requestHeaders()))
-            .exchange()
-            .expectBody()
-            .returnResult();
+        EntityExchangeResult<String> response = GatewayTestProperties.exchange(
+            webTestClient,
+            HttpMethod.GET,
+            testCase.path(),
+            testCase.requestHeaders()
+        );
 
         // then
         assertEquals(testCase.expectedStatus(), response.getStatus());
-        assertEquals(testCase.expectedBody(), new String(response.getResponseBody(), StandardCharsets.UTF_8));
+        assertEquals(testCase.expectedBody(), response.getResponseBody());
     }
 }
